@@ -92,6 +92,9 @@ const UserAuth = () => {
                     <p className="text-xl text-gray-300 max-w-md mx-auto leading-relaxed">
                         Join millions in meaningful conversations and share your unique perspective with the world
                     </p>
+                    <p className="text-xl text-gray-300 max-w-md mx-auto leading-relaxed">
+                        Made By Aditya
+                    </p>
                 </div>
             </div>
 
