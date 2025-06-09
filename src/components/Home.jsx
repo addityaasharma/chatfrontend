@@ -13,6 +13,8 @@ const Home = () => {
   const [followStatus, setFollowStatus] = useState({});
   const [showFollowingOnly, setShowFollowingOnly] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [followLoading, setFollowLoading] = useState({});
+
   const token = localStorage.getItem('authToken');
   const username = localStorage.getItem('username');
 
@@ -111,6 +113,7 @@ const Home = () => {
   };
 
   const handleFollow = async (userID, currentStatus) => {
+    setFollowLoading(prev => ({ ...prev, [userID]: true }));
     try {
       const res = await axios.post(
         `https://chatbackends-1.onrender.com/user/follow/${userID}`,
@@ -133,8 +136,11 @@ const Home = () => {
       }
     } catch (err) {
       alert(err.response?.data?.message || 'Error during follow/unfollow');
+    } finally {
+      setFollowLoading(prev => ({ ...prev, [userID]: false }));
     }
   };
+
 
   const handleManualRefresh = () => {
     fetchPosts(true);
@@ -217,13 +223,19 @@ const Home = () => {
                 {post.userID && post.userID !== currentUserID && (
                   <button
                     onClick={() => handleFollow(post.userID, followStatus[post.userID])}
-                    className={`mt-2 px-3 py-1 rounded-md font-semibold transition-colors duration-200 ${followStatus[post.userID] === 'follow'
-                      ? 'bg-gray-600 hover:bg-gray-700'
-                      : 'bg-purple-700 hover:bg-purple-600'
-                      }`}
+                    disabled={followLoading[post.userID]}
+                    className={`mt-2 px-3 py-1 rounded-md font-semibold transition-colors duration-200
+    ${followStatus[post.userID] === 'follow'
+                        ? 'bg-gray-600 hover:bg-gray-700'
+                        : 'bg-purple-700 hover:bg-purple-600'}
+    ${followLoading[post.userID] ? 'opacity-50 cursor-not-allowed' : ''}
+  `}
                   >
-                    {followStatus[post.userID] === 'follow' ? 'Unfollow' : 'Follow'}
+                    {followLoading[post.userID]
+                      ? (followStatus[post.userID] === 'follow' ? 'Unfollowing...' : 'Following...')
+                      : (followStatus[post.userID] === 'follow' ? 'Unfollow' : 'Follow')}
                   </button>
+
                 )}
               </div>
             ) : null
